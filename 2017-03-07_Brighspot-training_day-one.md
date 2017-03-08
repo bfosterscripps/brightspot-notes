@@ -1,6 +1,7 @@
 # Brightspot Training: Day One
 
 Rebecca McNeilly - rmcneilly@perfectsensedigital.com - Account Manager
+
 Dan Slaughter - Brightspot architect - trainer
 
 ## Agenda

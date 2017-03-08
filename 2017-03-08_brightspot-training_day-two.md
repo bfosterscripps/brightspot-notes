@@ -64,13 +64,31 @@ for (Article article : iterable) {
 query.fields("title"); // not sure what this does :D
 ```
 
+### SQL
+
+
+`/_debug/db-sql` Dari tool
+
+
+```
+Query<Article> query = Query.from(Article.class);
+String sql = Database.Static.getFirst(SqlDatabase.class).buildSelectStatement(query); // to get the SQL for a given Dari Query object
+```
+
+### Query for Trash
+
+```
+Query<Article> query = Query.from(Article.class);
+query.where("cms.content.trashed = ?", true); // will return the trashed Content
+```
+
 ### Query API
 
 [Query API reference](https://artifactory.psdops.com/psddev-releases/com/psddev/dari/3.2.2188-2d7dae/dari-3.2.2188-2d7dae-javadoc.jar!/com/psddev/dari/db/Query.html)
 
 To be able to query data from a java model, use the `@Indexed` annotation.
 
-To make a field essentially a primary key with the unique contstraint, you can use `@Indexed(unique = true)`.
+To make a field essentially a primary key with the unique constraint, you can use `@Indexed(unique = true)`.
 
 ```
 Query.from(Author.class)
@@ -220,6 +238,20 @@ static {
 
 The above is an example where you can prevent the `a` Article from saving if the `b` Article fails to save, so that you don't end up with a partial workflow committed.
 
+### Simulating Publish
+
+Saving from the Java (`.save()`) doesn't mimic an actual publish (so it only sets the field you set and bypasses many Dari workflows).
+
+You can still publish from the Java.
+```
+
+Article a;
+
+
+
+Content.Static.publish(a, null, null);
+```
+
 ## Annotations
 
 ### `@Deprecated`
@@ -276,6 +308,10 @@ private String headline; // this replaced the title private property
 ### `@Recordable.DisplayName`
 
 - `@Recordable.DisplayName("BLOG ARTICLE")` - to change the display name for an ObjectType
+
+### `@Indexed(visibility = true)`
+
+
 
 ## Validating Content
 
@@ -349,9 +385,16 @@ You can find these methods here:
 
 When an editor clicks into a field to edit, that particular field is locked for other editors modifying the same piece of Content (it greys out and can't be modified, and has a message about being locked).
 
+## Drafts
+
+The "Initial Draft" is the first draft saved.
+The "Scheduled Draft" ...
+"Scheduled" ...
+
 ## Links to Resources
 
 - [Dari Repository](https://github.com/perfectsense/dari)
 - [API documentation root](https://artifactory.psdops.com/psddev-releases/com/psddev/dari-db/3.2.2448-622660/dari-db-3.2.2448-622660-javadoc.jar!/index.html)
 - [ObjectType API Documentation](https://artifactory.psdops.com/psddev-releases/com/psddev/dari/3.2.2188-2d7dae/dari-3.2.2188-2d7dae-javadoc.jar!/com/psddev/dari/db/ObjectType.html)
 - [Query API reference](https://artifactory.psdops.com/psddev-releases/com/psddev/dari/3.2.2188-2d7dae/dari-3.2.2188-2d7dae-javadoc.jar!/com/psddev/dari/db/Query.html)
+- [Schedule API Documentation](https://artifactory.psdops.com/psddev-releases/com/psddev/cms/3.2.5745-1cb7d2/cms-3.2.5745-1cb7d2-javadoc.jar!/index.html)
