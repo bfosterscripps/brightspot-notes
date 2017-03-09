@@ -45,6 +45,46 @@ Database.java has a bunch of methods that need to be implemented for any impleme
 
 (We should look at interfacing with the JCR).
 
+### Many to Many Relationships
+
+Let's say you need an Employee class and a Project class where the project has its own start and end dates, and employees can be on many projects with their own start and end dates that may not be the same as the project start and end date. This is a case for a Bridge Table in relational databases, but in the world of Dari, we are limited to Java classes.
+
+We can create a class that has an employee, project, and dates for start and end. I named mine `EmployeeProjectTenure.java`, but in our training the name `ProjectMember.java` was chosen. That works fine, but what about if we need access to the employees and project objects both.
+
+You can create an Interface that Project and Employee both implement. In our example, we created an interface called `DurationTrackable`.
+This interface must extend `Recordable`.
+
+### Modification
+
+[Modifications Documentation](http://docs.brightspot.com/cms/developers-guide/content-modeling/modifications.html)
+
+Moving start and end date into a common, shared space that is inherited and shared by the places that otherwise duplicated them, e.g. the start and end dates in Project.java and in Employee.java can be moved into a multiple inheritance pattern via interface and modification class.
+
+ToolUserModification.java:
+
+```
+package
+import com.psddev.dari.db.Modification;
+
+public class ToolUserModification extends Modification<DurationTrackable> {
+
+}
+```
+
+```
+public class DurationTrackableData extends
+```
+
+`.as()`
+
+```
+for (DurationTrackableData dt : Query.from(DurationTrackable.class).where("startDate != missing").selectAll() {
+  Duration
+}
+```
+
+
+
 ## Query
 
 `Query.from(Article.class)` - the base query on which additional functions can be used, e.g. `Query.from(Article.class).selectAll()`
@@ -311,7 +351,15 @@ private String headline; // this replaced the title private property
 
 ### `@Indexed(visibility = true)`
 
+... something about making fields invisible, for example when some data is in a trashed state.
 
+### `@Recordable.FieldInternalNamePrefix`
+
+Used to ensure a unique name by appending the prefix, generally (such as with modification pattern) by the name of the common interface, e.g. `@Recordable.FieldInternalNamePrefix("durationTrackable.")`
+
+### `@ToolUi.Hidden(false)` for Interfaces
+
+Use the above to make sure an interface can be searched by editors.
 
 ## Validating Content
 
@@ -391,6 +439,26 @@ The "Initial Draft" is the first draft saved.
 The "Scheduled Draft" ...
 "Scheduled" ...
 
+## Save APIs
+
+```
+save();
+
+saveUniquely();
+
+saveImmediately(); // save independent of the transaction (skip the transaction control)
+
+// same as save() for MySQL, but for Solr there are two steps:
+// 1. posting document and saving it
+// 2. then making it available to search (which takes longer)
+// saveEventually() lets it save it in Solr but not do the slower search index right then, for performance optimization
+saveEventually();
+
+// skips before and after saves and all validation steps (e.g. unique constraint)
+getState().saveUnsafely(); // intentionally abstracted to be harder to use, by requiring getting the state first before using it
+
+```
+
 ## Links to Resources
 
 - [Dari Repository](https://github.com/perfectsense/dari)
@@ -398,3 +466,5 @@ The "Scheduled Draft" ...
 - [ObjectType API Documentation](https://artifactory.psdops.com/psddev-releases/com/psddev/dari/3.2.2188-2d7dae/dari-3.2.2188-2d7dae-javadoc.jar!/com/psddev/dari/db/ObjectType.html)
 - [Query API reference](https://artifactory.psdops.com/psddev-releases/com/psddev/dari/3.2.2188-2d7dae/dari-3.2.2188-2d7dae-javadoc.jar!/com/psddev/dari/db/Query.html)
 - [Schedule API Documentation](https://artifactory.psdops.com/psddev-releases/com/psddev/cms/3.2.5745-1cb7d2/cms-3.2.5745-1cb7d2-javadoc.jar!/index.html)
+- [Field Locking Documentation](http://docs.brightspot.com/cms/editorial-guide/locking/all.html)
+- [ToolUi API Documentation](https://artifactory.psdops.com/psddev-releases/com/psddev/cms/3.2.5745-1cb7d2/cms-3.2.5745-1cb7d2-javadoc.jar!/com/psddev/cms/db/ToolUi.html)
